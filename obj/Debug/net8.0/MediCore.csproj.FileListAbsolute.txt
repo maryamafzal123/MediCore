@@ -112,3 +112,4 @@ D:\Medicore\MediCore\obj\Debug\net8.0\refint\MediCore.dll
 D:\Medicore\MediCore\obj\Debug\net8.0\MediCore.pdb
 D:\Medicore\MediCore\obj\Debug\net8.0\MediCore.genruntimeconfig.cache
 D:\Medicore\MediCore\obj\Debug\net8.0\ref\MediCore.dll
+D:\Medicore\MediCore\obj\Debug\net8.0\MediCore.sourcelink.json

@@ -1,0 +1,22 @@
+.auth { min-height: 100vh; display: grid; grid-template-columns: 1.1fr 1fr; }
+.hero { background: var(--sidebar); color: #d7ebe7; padding: 48px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+.hero::after { content: ''; position: absolute; width: 520px; height: 520px; border-radius: 50%; right: -180px; bottom: -200px; background: radial-gradient(circle, rgba(20,184,166,.35), transparent 65%); }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; color: #fff; }
+.logo { width: 34px; height: 34px; border-radius: 10px; background: var(--primary); display: grid; place-items: center; }
+.hero h1 { font-size: 38px; line-height: 1.15; color: #fff; max-width: 440px; position: relative; z-index: 1; }
+.hero p { max-width: 420px; color: #9fbfb9; font-size: 15px; position: relative; z-index: 1; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; position: relative; z-index: 1; }
+.chips span { border: 1px solid rgba(255,255,255,.15); padding: 6px 12px; border-radius: 999px; font-size: 13px; }
+.panel { display: grid; place-items: center; padding: 32px 20px; }
+.form { width: 100%; max-width: 380px; }
+.form h2 { font-size: 24px; margin-bottom: 4px; }
+.form > p { color: var(--muted); margin: 0 0 24px; }
+.demo { margin-top: 22px; padding: 14px; background: var(--primary-soft); border-radius: 12px; font-size: 13px; }
+.demo b { color: var(--primary); }
+.demo button { background: none; border: none; color: var(--primary); font: inherit; font-weight: 700; cursor: pointer; padding: 2px 0; text-decoration: underline; }
+.switch { margin-top: 18px; text-align: center; color: var(--muted); }
+.roles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.role { border: 1.5px solid var(--line); border-radius: 12px; padding: 12px; cursor: pointer; text-align: left; background: var(--surface); font: inherit; }
+.role.sel { border-color: var(--primary); background: var(--primary-soft); }
+.role b { display: block; }
+@media (max-width: 860px) { .auth { grid-template-columns: 1fr; } .hero { display: none; } }

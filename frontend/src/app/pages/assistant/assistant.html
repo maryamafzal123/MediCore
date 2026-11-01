@@ -1,0 +1,68 @@
+<div class="chat-page">
+  <!-- ===== Conversation list ===== -->
+  <aside class="convos" [class.show]="showList()">
+    <button class="btn btn-primary btn-block" (click)="newChat()">+ New chat</button>
+    <div class="convo-list">
+      @for (c of conversations(); track c.id) {
+        <div class="convo" [class.active]="c.id === activeId()" (click)="open(c.id)">
+          <span class="convo-title">{{ c.title }}</span>
+          <button class="del" title="Delete" (click)="remove(c, $event)">✕</button>
+        </div>
+      } @empty {
+        <div class="muted small pad">No chats yet.</div>
+      }
+    </div>
+  </aside>
+
+  <!-- ===== Chat window ===== -->
+  <section class="window">
+    <header>
+      <button class="btn btn-sm list-btn" (click)="showList.set(!showList())">☰ Chats</button>
+      <div class="bot-avatar">✦</div>
+      <div>
+        <h2>{{ activeTitle() }}</h2>
+        <div class="muted small">MediCore Assistant · reads live hospital data</div>
+      </div>
+    </header>
+
+    <div class="messages" #scroller>
+      @if (!messages().length && !thinking()) {
+        <div class="welcome">
+          <div class="big-avatar">✦</div>
+          <h2>Assalam-o-Alaikum, {{ auth.name().split(' ')[0] }}!</h2>
+          <p class="muted">I can look up doctors, check free slots, manage appointments, and answer hospital questions. Try:</p>
+          <div class="starters">
+            @for (s of starters(); track s) { <button (click)="send(s)">{{ s }}</button> }
+          </div>
+        </div>
+      }
+
+      @for (m of messages(); track m.id) {
+        <div class="msg" [class.user]="m.role === 'user'">
+          @if (m.role === 'assistant') { <div class="bot-avatar sm">✦</div> }
+          <div class="bubble-wrap">
+            <div class="bubble md" [attr.dir]="isUrdu(m.content) ? 'rtl' : null" [innerHTML]="render(m.content)"></div>
+            @if (m.tools?.length) {
+              <div class="tools">
+                @for (t of m.tools; track t) { <span>✓ {{ toolLabel(t) }}</span> }
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (thinking()) {
+        <div class="msg">
+          <div class="bot-avatar sm">✦</div>
+          <div class="bubble typing"><span></span><span></span><span></span></div>
+        </div>
+      }
+    </div>
+
+    <div class="composer">
+      <textarea rows="1" [(ngModel)]="draft" (keydown)="onKey($event)" placeholder="Message MediCore Assistant… (Enter to send, Shift+Enter for new line)" [disabled]="thinking()"></textarea>
+      <button class="btn btn-primary send" [disabled]="!draft.trim() || thinking()" (click)="send()">➤</button>
+    </div>
+    <div class="disclaimer">The assistant does not give medical diagnoses. In an emergency call Rescue 1122.</div>
+  </section>
+</div>

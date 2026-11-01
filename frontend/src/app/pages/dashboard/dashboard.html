@@ -1,0 +1,121 @@
+<div class="page-head">
+  <div>
+    <h1>{{ greeting }}, {{ auth.name().split(' ')[0] }}</h1>
+    <p>Here's what's happening at MediCore today.</p>
+  </div>
+  @if (role() === 'Patient') { <a class="btn btn-primary" routerLink="/doctors">+ Book appointment</a> }
+</div>
+
+@if (loading()) {
+  <div class="empty"><div class="spinner" style="margin:auto"></div></div>
+} @else {
+  <!-- ===== Stat tiles ===== -->
+  <div class="tiles">
+    @if (role() === 'Admin' && stats(); as s) {
+      <div class="tile"><span>Doctors</span><b>{{ s.totalDoctors }}</b></div>
+      <div class="tile"><span>Patients</span><b>{{ s.totalPatients }}</b></div>
+      <div class="tile"><span>Appointments today</span><b>{{ s.todayAppointments }}</b></div>
+      <div class="tile"><span>Prescriptions</span><b>{{ s.totalPrescriptions }}</b></div>
+    }
+    @if (role() === 'Doctor') {
+      <div class="tile"><span>Today</span><b>{{ today().length }}</b></div>
+      <div class="tile"><span>Upcoming</span><b>{{ upcoming().length }}</b></div>
+      <div class="tile"><span>Completed</span><b>{{ completed() }}</b></div>
+      <div class="tile"><span>Patients seen</span><b>{{ uniquePatients() }}</b></div>
+    }
+    @if (role() === 'Patient') {
+      <div class="tile"><span>Upcoming visits</span><b>{{ upcoming().length }}</b></div>
+      <div class="tile"><span>Completed visits</span><b>{{ completed() }}</b></div>
+      <div class="tile"><span>Prescriptions</span><b>{{ prescriptions().length }}</b></div>
+    }
+  </div>
+
+  <div class="cols">
+    <div class="stack">
+      <!-- ===== Admin charts ===== -->
+      @if (role() === 'Admin' && stats(); as s) {
+        <div class="card">
+          <div class="card-head"><h2>Appointments · last 7 days</h2><span class="muted small">{{ s.totalAppointments }} total</span></div>
+          <div class="bars">
+            @for (d of s.last7Days; track d.date) {
+              <div class="bar-col">
+                <span class="bar-val">{{ d.count }}</span>
+                <div class="bar" [style.height.%]="(d.count / maxDay()) * 100"></div>
+                <span class="bar-label">{{ dayLabel(d.date) }}</span>
+              </div>
+            }
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2>By status</h2></div>
+          <div class="seg">
+            @for (r of statusRows(); track r[0]) {
+              <div class="seg-part seg-{{ r[0] }}" [style.flex]="r[1] || 0.0001"></div>
+            }
+          </div>
+          <div class="legend">
+            @for (r of statusRows(); track r[0]) {
+              <div><span class="dot seg-{{ r[0] }}"></span>{{ r[0] }} <b>{{ r[1] }}</b> <span class="muted">({{ (r[1] / statusTotal() * 100).toFixed(0) }}%)</span></div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- ===== Schedule / upcoming list ===== -->
+      <div class="card">
+        <div class="card-head">
+          <h2>{{ role() === 'Doctor' ? "Today's schedule" : 'Upcoming appointments' }}</h2>
+          <a routerLink="/appointments" class="small">View all →</a>
+        </div>
+        @let list = role() === 'Doctor' ? today() : upcoming().slice(0, 5);
+        @for (a of list; track a.id) {
+          <div class="appt">
+            <div class="when">
+              <b>{{ time(a.appointmentDate) }}</b>
+              <span class="muted small">{{ fmtDate(a.appointmentDate) }}</span>
+            </div>
+            <div class="grow">
+              <b>{{ role() === 'Doctor' ? a.patientName : 'Dr. ' + a.doctorName }}</b>
+              <div class="muted small">{{ role() === 'Admin' ? a.patientName + ' · ' : '' }}{{ a.notes || a.specialization }}</div>
+            </div>
+            <span class="badge badge-{{ a.status }}">{{ a.status }}</span>
+          </div>
+        } @empty {
+          <div class="empty">{{ role() === 'Doctor' ? 'No appointments today. Enjoy the calm!' : 'Nothing scheduled.' }}</div>
+        }
+      </div>
+    </div>
+
+    <div class="stack">
+      <!-- ===== AI assistant card ===== -->
+      <div class="card ai">
+        <div class="ai-badge">✦ AI Assistant</div>
+        <h2>Ask anything, in English or Urdu</h2>
+        <p>The assistant reads live hospital data and can act for you.</p>
+        <div class="chips">
+          @for (s of suggestions(); track s) {
+            <a [routerLink]="['/assistant']" [queryParams]="{ q: s }">{{ s }}</a>
+          }
+        </div>
+      </div>
+
+      @if (role() === 'Admin' && stats(); as s) {
+        <div class="card">
+          <div class="card-head"><h2>Doctors by specialization</h2></div>
+          @for (r of specRows(); track r[0]) {
+            <div class="spec"><span>{{ r[0] }}</span><b>{{ r[1] }}</b></div>
+          }
+        </div>
+      }
+
+      @if (role() === 'Patient' && prescriptions()[0]; as p) {
+        <div class="card">
+          <div class="card-head"><h2>Latest prescription</h2><a routerLink="/prescriptions" class="small">All →</a></div>
+          <b>{{ p.diagnosis }}</b>
+          <div class="muted small">Dr. {{ p.doctorName }} · {{ fmtDate(p.appointmentDate) }}</div>
+          <p class="rx">{{ p.medications }}</p>
+        </div>
+      }
+    </div>
+  </div>
+}
